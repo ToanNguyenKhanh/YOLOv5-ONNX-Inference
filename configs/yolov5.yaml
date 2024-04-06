@@ -1,0 +1,7 @@
+onnx: model/yolov5s.onnx
+size: [640,640]
+batch_size: 1
+device: gpu
+stride: 32
+confidence_threshold: 0.5
+iou_threshold: 0.5
