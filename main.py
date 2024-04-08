@@ -1,6 +1,6 @@
 import yaml
 import cv2
-from src.models.yolov5.yolov5_onnx import YoloV5Onnx
+from src.models.yoloV5.yolov5_onnx import YoloV5Onnx
 
 if __name__ == '__main__':
     config_fp = "configs/yolov5.yaml"

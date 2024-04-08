@@ -3,7 +3,7 @@ import copy
 import torch
 import numpy as np
 import onnxruntime as ort
-from src.models.yolov5.yolov5_utils import (letterbox, scale_boxes, non_max_suppression)
+from src.models.yoloV5.yolov5_utils import (letterbox, scale_boxes, non_max_suppression)
 
 class YoloV5Onnx:
     def __init__(self, config: yaml) -> None:
@@ -29,7 +29,7 @@ class YoloV5Onnx:
         # Init model
         self.sess = ort.InferenceSession(self.onnx, providers=providers)
         self.input_name = self.sess.get_inputs()[0].name
-        self.output_name = self.sess.get_outputs()[0].name
+        self.output_name = [self.sess.get_outputs()[0].name]
     def pre_process(self, images: list):
         imgs = []
         for img in images:
@@ -45,12 +45,12 @@ class YoloV5Onnx:
             images = [images]
         ori_images = copy.deepcopy(images)
         images = self.pre_process(images)
-        pred = self.sess.run(None, {self.input_name: images})[0]
+        pred = self.sess.run(self.output_name, {self.input_name: images})[0]
         pred = self.post_process(pred, images, ori_images)
         return pred
     def post_process(self, pred: np.array, images, ori_images):
         pred = [torch.from_numpy(pred)]
-        pred = non_max_suppression(pred, self.conf_thres, self.iou_thres, False, 1000)
+        pred = non_max_suppression(pred, self.conf_thres, self.iou_thres,None, False, 1000)
         post_processed_images = []
         for i, det in enumerate(pred):  # per image
             if len(det):

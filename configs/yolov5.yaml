@@ -3,5 +3,5 @@ size: [640,640]
 batch_size: 1
 device: gpu
 stride: 32
-confidence_threshold: 0.5
-iou_threshold: 0.5
+confidence_threshold: 0.25
+iou_threshold: 0.45
