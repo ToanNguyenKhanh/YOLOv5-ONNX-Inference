@@ -3,8 +3,8 @@ import copy
 import torch
 import numpy as np
 import onnxruntime as ort
-from src.models.yoloV5.yolov5_utils import (letterbox, scale_boxes, non_max_suppression)
-
+from src.models.yolov5.yolov5_utils import (letterbox, scale_boxes, non_max_suppression)
+from src.utils.logger import Logger
 class YoloV5Onnx:
     def __init__(self, config: yaml) -> None:
         # Load config
@@ -16,6 +16,7 @@ class YoloV5Onnx:
         self.device = self.config['device']
         self.conf_thres = self.config['confidence_threshold']
         self.iou_thres = self.config['iou_threshold']
+        self.logger = Logger.__call__().get_logger()
 
         if self.device == 'cpu':
             providers = ['CPUExecutionProvider']
@@ -24,12 +25,17 @@ class YoloV5Onnx:
         else:
             # providers = ['CPUExecutionProvider', 'GPUExecutionProvider']
             # TODO: Logging
-            print('Device must be either cpu or gpu')
+            # print('Device must be either cpu or gpu')
+            self.logger.error('Do not support {} !'.format(self.device))
+            exit(0)
         print(providers)
+
         # Init model
         self.sess = ort.InferenceSession(self.onnx, providers=providers)
         self.input_name = self.sess.get_inputs()[0].name
         self.output_name = [self.sess.get_outputs()[0].name]
+
+        self.logger.info('Initialize YoloV5 model successfully!')
     def pre_process(self, images: list):
         imgs = []
         for img in images:
@@ -50,7 +56,7 @@ class YoloV5Onnx:
         return pred
     def post_process(self, pred: np.array, images, ori_images):
         pred = [torch.from_numpy(pred)]
-        pred = non_max_suppression(pred, self.conf_thres, self.iou_thres,None, False, 1000)
+        pred = non_max_suppression(pred, self.conf_thres, self.iou_thres,None,   False, 1000)
         post_processed_images = []
         for i, det in enumerate(pred):  # per image
             if len(det):
