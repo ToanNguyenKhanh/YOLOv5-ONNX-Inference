@@ -1,0 +1,2 @@
+face_detection: configs/scrfd_config.yaml
+face_encode: configs/arcface_config.yaml

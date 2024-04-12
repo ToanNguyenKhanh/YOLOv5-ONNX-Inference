@@ -2,12 +2,7 @@ import datetime
 import logging
 import time
 import os
-class Singleton(type):
-    _instances = {}
-    def __call__(cls, *args, **kwargs):
-        if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
-        return cls._instances[cls]
+from src.utils.singleton import Singleton
 
 #Python2
 class Logger(object, metaclass=Singleton):
